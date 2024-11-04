@@ -23,6 +23,7 @@ prompt = "explain the image"
 def download_image(url, folder_path, image_name):
     """Downloads an image from a URL and saves it to a specified folder."""
     try:
+        print(f"url: {url}")
         response = requests.get(url)
         response.raise_for_status()  # Check if the request was successful
         image_path = os.path.join(folder_path, image_name)
