@@ -144,3 +144,6 @@ def index(request):
         })
 
     return render(request, "amaze/index.html")  # Handle GET request
+
+def new(request):
+    return render(request, "amaze/new.html")
