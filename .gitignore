@@ -1,0 +1,4 @@
+**/pyenv/
+**/__pycache__/
+.env
+*.sqlite3
