@@ -94,10 +94,10 @@
     </header>
     <div class="main-container">
         <h2 class="text-center">Transform Your Posts into Winning Listings!</h2>
-        <form id="linkForm" method="POST" action="/submit">
-            <input type="hidden" name="csrf_token" value="YOUR_CSRF_TOKEN_HERE">
+        <form id="linkForm" method="POST" >
+            {% csrf_token %}
             <div class="form-group">
-                <input type="text" class="form-control" id="postLink" name="postLink" placeholder="Paste your post link here..." required>
+                <input type="text" class="form-control" id="postLink" name="post_url" placeholder="Paste your post link here..." required>
             </div>
             <button type="submit">Generate Listing!</button>
         </form>
@@ -105,24 +105,22 @@
 
             <!-- we have to recreate this -->
 
-            <h3>Your Generated Listing</h3>
-            <p><strong>Title:</strong> Sample Product Title</p>
-            <p><strong>Bullet Points:</strong></p>
-            <ul>
-                <li>High-quality material</li>
-                <li>Unique design</li>
-                <li>Customer favorite</li>
-            </ul>
-            <p><strong>Description:</strong> This is a sample description generated from the post.</p>
-            <p><strong>Keywords:</strong> sample, product, amazon, listing</p>
+            <h3>{{heading}}</h3>
+            <p><strong>Platform:</strong> {{Platform}}</p>
+            <p><strong>Image</strong></p>
+            {% for image in  images%}
+            <img src={{image}} alt="image">
+            {% endfor %}
+            <p><strong>Author: </strong>{{Author}}</p>
+            <p><strong>Content: </strong> {{Content}} </p>
         </div>
-    </div>
+    </div> 
+    
     <footer>
         <p>&copy; 2024 Retro Generator. <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
     </footer>
-    <script>
+    <!-- <script>
         document.getElementById('linkForm').onsubmit = function(event) {
-            event.preventDefault();
             const link = document.getElementById('postLink').value;
             if (link) {
                 document.getElementById('resultCard').style.display = 'block';
@@ -133,6 +131,6 @@
     </script>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script> -->
 </body>
 </html>
