@@ -8,21 +8,17 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 # import
 import os
 import json
-from datetime import date
 from dotenv import load_dotenv
-from datetime import date
- 
-def get_date():
-    # return current date
-    return date.today() 
-
-load_dotenv() # load env
-api_key=os.getenv('CHATGPT_API') # cofiguring model api 
-
-
-import os
 import requests
 from bs4 import BeautifulSoup
+from dotenv import load_dotenv
+from openai import OpenAI
+load_dotenv()
+client = OpenAI(
+    # This is the default and can be omitted
+    api_key=os.environ.get("OPENAI_API_KEY"),
+)
+prompt = "explain the image"
 
 def download_image(url, folder_path, image_name):
     """Downloads an image from a URL and saves it to a specified folder."""
@@ -135,13 +131,35 @@ def index(request):
         print(f"Platform: {post_info['platform']}")
         print(f"Author: {post_info['author']}")
         print(f"Content: {post_info['content']}")
+        print(f"Image: {post_info['images']}")
+               
+        img_url = post_info['images']
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": prompt},
+                        {
+                            "type": "image_url",
+                            "image_url": {"url": f"{img_url[0]}"},
+                        },
+                    ],
+                }
+            ],
+        )
+        print(response)
+
         return render(request, "amaze/index.html", {
             'images': post_info['images'],
+            'ai_res': response.choices[0].message.content,
             'heading': "Extracted Post Information:",  # Use quotes around keys
             'Platform': post_info['platform'],  # Remove curly braces and quotes
             'Author': post_info['author'],
             'Content': post_info['content'],
         })
+        
 
     return render(request, "amaze/index.html")  # Handle GET request
 
