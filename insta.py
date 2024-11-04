@@ -2,13 +2,14 @@ import instaloader
 from openai import OpenAI
 import os
 from dotenv import load_dotenv
+
+# Load environment variables
 load_dotenv()
 
-client = OpenAI(
-    # This is the default and can be omitted
-    api_key=os.environ.get("OPENAI_API_KEY"),
-)
-prompt = "explain the image"
+# Initialize OpenAI client
+client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+
+prompt = "Explain the image"
 
 def extract_instagram_post_info(url):
     """Extracts information from an Instagram post and downloads images using instaloader."""
@@ -41,13 +42,14 @@ def extract_instagram_post_info(url):
 # Example usage:
 url = 'https://www.instagram.com/p/DBS3usJNsMx/?img_index=1'
 post_info = extract_instagram_post_info(url)
-print(post_info['images'])
 
-# Path to the image file you want to send
-img_url = post_info['images']
-response = client.chat.completions.create(
-    model="gpt-4o-mini",
-    messages=[
+if post_info and post_info['images']:
+    img_url = post_info['images'][0]  # Use the first image for explanation
+
+    # Prepare and send the request to OpenAI
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
         {
             "role": "user",
             "content": [
@@ -59,5 +61,9 @@ response = client.chat.completions.create(
             ],
         }
     ],
-)
-print(response)
+    )
+    
+    # Print the response from OpenAI
+    print(response)
+else:
+    print("No image information available.")
