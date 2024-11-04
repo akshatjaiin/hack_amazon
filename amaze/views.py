@@ -136,6 +136,7 @@ def index(request):
         print(f"Author: {post_info['author']}")
         print(f"Content: {post_info['content']}")
         return render(request, "amaze/index.html", {
+            'images': post_info['images'],
             'heading': "Extracted Post Information:",  # Use quotes around keys
             'Platform': post_info['platform'],  # Remove curly braces and quotes
             'Author': post_info['author'],
