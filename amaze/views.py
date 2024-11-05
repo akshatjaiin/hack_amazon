@@ -12,14 +12,14 @@ from dotenv import load_dotenv
 import requests
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
+import instaloader
+
 from openai import OpenAI
 load_dotenv()
 client = OpenAI(
     # This is the default and can be omitted
     api_key=os.environ.get("OPENAI_API_KEY"),
 )
-prompt = "explain the image"
-
 def download_image(url, folder_path, image_name):
     """Downloads an image from a URL and saves it to a specified folder."""
     try:
@@ -34,22 +34,27 @@ def download_image(url, folder_path, image_name):
         print(f"Error downloading image {image_name}: {e}")
 
 def extract_instagram_post_info(url):
-    """Extracts information from an Instagram post and downloads images."""
-    response = requests.get(url)
-    soup = BeautifulSoup(response.text, 'html.parser')
-
-    # Extracting post details
+    """Extracts information from an Instagram post and downloads images using instaloader."""
+    loader = instaloader.Instaloader(
+        download_comments=False,
+        download_geotags=True,
+        download_pictures=True,
+        download_video_thumbnails=False,
+        save_metadata=True
+    )
+    shortcode = url.split('/')[-2]
     try:
-        post_content = soup.find('meta', property='og:description')['content']
-        post_images = [img['content'] for img in soup.find_all('meta', property='og:image')]
-        post_author = soup.find('meta', property='og:title')['content'].split(' ')[0]  # Assuming the first word is the username
-
-        return {
+        post = instaloader.Post.from_shortcode(loader.context, shortcode)       
+        # Extracting post details
+        post_info = {
             'platform': 'Instagram',
-            'author': post_author,
-            'content': post_content,
-            'images': post_images
+            'author': post.owner_username,
+            'content': post.caption,  # Caption of the post
+            'images': [node.display_url for node in post.get_sidecar_nodes()] if post.is_video else [post.url]  # Handle video posts
         }
+        # Download the post to a folder named after the shortcode
+        loader.download_post(post, target=shortcode)
+        return post_info
     except Exception as e:
         print(f"Error extracting Instagram post: {e}")
         return None
@@ -117,7 +122,33 @@ def save_images(images, folder_path):
         image_name = f"image_{index + 1}.jpg"  # Naming images sequentially
         download_image(image_url, folder_path, image_name)
 
-
+def askAi(post_images,post_text):
+    prompt = """i gave u a image and some text of a online post i want you to extract some data from it and send it in a particular format.
+    You have to extract 
+    {
+        companyName?:string,
+        productCategory?:string (eg. tech or  food etc..),
+        productType?:string (eg. keyboard or watch etc..),
+        productData?:JSON (eg if image is given then extract the product datas like its color , version , predicted age (this fildes are optional)),
+        };
+        You are only allowed to response in the above formate if anyfield is found just response with {... , <field>:"", ...};
+    """
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": prompt+"The Text: "+post_text},
+                    {
+                        "type": "image_url",
+                        "image_url": {"url": f"{post_images[0]}"},
+                    },
+                ],
+            }
+        ],
+    )
+    return response;
 
 def index(request):
     if request.method == "POST":
@@ -133,24 +164,8 @@ def index(request):
         print(f"Author: {post_info['author']}")
         print(f"Content: {post_info['content']}")
         print(f"Image: {post_info['images']}")
-               
-        img_url = post_info['images']
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[
-                {
-                    "role": "user",
-                    "content": [
-                        {"type": "text", "text": prompt},
-                        {
-                            "type": "image_url",
-                            "image_url": {"url": f"{img_url[0]}"},
-                        },
-                    ],
-                }
-            ],
-        )
-        print(response)
+        response = askAi(post_info['images'],post_info['content'])
+        print(response.choices[0].message.content);
 
         return render(request, "amaze/index.html", {
             'images': post_info['images'],
