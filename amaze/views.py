@@ -125,16 +125,68 @@ def save_images(images, folder_path):
 def askAi(post_images,post_text):
     prompt = """i gave u a image and some text of a online post i want you to extract some data from it and send it in a particular format.
     You have to extract 
-    {
-        companyName?:string,
-        productCategory?:string (eg. tech or  food etc..),
-        productType?:string (eg. keyboard or watch etc..),
-        productData?:JSON (eg if image is given then extract the product datas like its color , version , predicted age (this fildes are optional)),
-        };
+   {
+    "companyName": "string",  // Name of the company
+    "productCategory": "string",  // E.g., "tech", "food"
+    "productType": "string",  // E.g., "keyboard", "watch"
+    "listingDetails": {
+        "productTitle": "string",  // The main product title, e.g., "Wireless Bluetooth Keyboard"
+        "productDescription": "string",  // A detailed description
+        "price": {
+        "currency": "string",  // E.g., "USD", "INR"
+        "amount": "number"  // E.g., 49.99
+        },
+        "productImages": [
+        {
+            "imageURL": "string",  // URL of the product image
+            "altText": "string"  // Short description of the image
+        }
+        ],
+        "productAttributes": {
+        "color": "string",  // E.g., "black", "red"
+        "size": "string",  // E.g., "Medium", "15-inch"
+        "weight": "string",  // E.g., "500g"
+        "dimensions": {
+            "length": "number",  // Length in cm
+            "width": "number",  // Width in cm
+            "height": "number"  // Height in cm
+        },
+        "material": "string",  // E.g., "plastic", "metal"
+        "warranty": "string",  // E.g., "1 year"
+        "ageRecommendation": "string",  // E.g., "12+", "Adult"
+        "version": "string",  // E.g., "2023 Model"
+        "otherAttributes": "JSON"  // Custom additional attributes as a nested JSON object
+        },
+        "availability": {
+        "inStock": "boolean",  // Whether the item is in stock
+        "quantity": "number"  // Available quantity
+        },
+        "shippingDetails": {
+        "weight": "number",  // Shipping weight in kg
+        "dimensions": {
+            "length": "number",
+            "width": "number",
+            "height": "number"
+        }
+        },
+        "categoryHierarchy": [
+        "string"  // E.g., ["Electronics", "Computers", "Keyboards"]
+        ]
+    },
+    "sellerInfo": {
+        "sellerName": "string",  // Name of the seller or store
+        "contactEmail": "string",  // Contact email for support
+        "sellerRating": "number"  // E.g., 4.5 (rating out of 5)
+    }
+    };
+
         You are only allowed to response in the above formate if anyfield is found just response with {... , <field>:"", ...};
     """
+    print("post text inside function: "+post_text)
+
     response = client.chat.completions.create(
         model="gpt-4o-mini",
+
         messages=[
             {
                 "role": "user",
@@ -148,14 +200,15 @@ def askAi(post_images,post_text):
             }
         ],
     )
-    return response;
+    return response
 
 def index(request):
     if request.method == "POST":
         print("Post Request receive")
         post_url = request.POST.get("post_url")  # Use request.POST to get the URL
         post_info = extract_post_info(post_url)
-
+        if post_info['content'] == None:
+            post_info['content'] == "No Post Discription Found "
         # Create a folder to save images
         folder_name = "down_image"
         save_images(post_info['images'], folder_name)
@@ -165,7 +218,7 @@ def index(request):
         print(f"Content: {post_info['content']}")
         print(f"Image: {post_info['images']}")
         response = askAi(post_info['images'],post_info['content'])
-        print(response.choices[0].message.content);
+        print(response.choices[0].message.content)
 
         return render(request, "amaze/index.html", {
             'images': post_info['images'],
