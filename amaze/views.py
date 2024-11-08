@@ -3,7 +3,7 @@ from django.urls import reverse
 from django.db import IntegrityError
 from django.contrib.sessions.models import Session
 from django.shortcuts import  render, get_object_or_404
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse  
+from django.http import HttpResponse, JsonResponse  
 
 # import
 import os
@@ -123,26 +123,31 @@ def save_images(images, folder_path):
         download_image(image_url, folder_path, image_name)
 
 def askAi(post_images,post_text):
-    prompt = constant.prompt
-    print("post text inside function: "+post_text)
+    try:
+        prompt = constant.prompt
+        print("post text inside function: "+post_text)
 
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
 
-        messages=[
-            {
-                "role": "user",
-                "content": [
-                    {"type": "text", "text": prompt+"The Text: "+post_text},
-                    {
-                        "type": "image_url",
-                        "image_url": {"url": f"{post_images[0]}"},
-                    },
-                ],
-            }
-        ],
-    )
-    return response
+            messages=[
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": prompt+"The Text: "+post_text},
+                        {
+                            "type": "image_url",
+                            "image_url": {"url": f"{post_images[0]}"},
+                        },
+                    ],
+                }
+            ],
+        )
+        print(response);
+        return response
+    except Exception as error:
+        print("Error, while ai response:",error);
+        return None;
 
 def index(request):
     post_info = {};
@@ -163,16 +168,18 @@ def index(request):
         for key, default_value in default_values.items():
             post_info[key] = post_info.get(key, default_value) or default_value
     
-            # Create a folder to save images
-            folder_name = "down_image"
-            save_images(post_info['images'], folder_name)
-            print("\nExtracted Post Information:")
-            print(f"Platform: {post_info['platform']}")
-            print(f"Author: {post_info['author']}")
-            print(f"Content: {post_info['content']}")
-            print(f"Image: {post_info['images']}")
-            response = askAi(post_info['images'],post_info['content'])
-            print(response.choices[0].message.content)
+        # Create a folder to save images
+        folder_name = "down_image"
+        save_images(post_info['images'], folder_name)
+        print("\nExtracted Post Information:")
+        print(f"Platform: {post_info['platform']}")
+        print(f"Author: {post_info['author']}")
+        print(f"Content: {post_info['content']}")
+        print(f"Image: {post_info['images']}")
+        response = askAi(post_info['images'],post_info['content'])
+        if(response == None):
+            return HttpResponse("<p>Error, while asking gpt about product</p>");
+        print(response.choices[0].message.content)
 
         return render(request, "amaze/index.html", {
             'images': post_info['images'],
