@@ -13,7 +13,7 @@ import requests
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 import instaloader
-from * import constant 
+from . import constant 
 from openai import OpenAI
 load_dotenv()
 client = OpenAI(
@@ -151,27 +151,27 @@ def index(request):
         post_info = extract_post_info(post_url)
 
         # Define default values for None objects
-    default_values = {
-      'content': "No Post Description Found",
-      'images': "No Images Found",
-      'platform': "Unknown",
-      'author': "Unknown"
-    }
+        default_values = {
+        'content': "No Post Description Found",
+        'images': "No Images Found",
+        'platform': "Unknown",
+        'author': "Unknown"
+        }
 
-# Replace None values with default values for any missing or None fields
-  for key, default_value in default_values.items():
-      post_info[key] = post_info.get(key, default_value) or default_value
- 
-        # Create a folder to save images
-        folder_name = "down_image"
-        save_images(post_info['images'], folder_name)
-        print("\nExtracted Post Information:")
-        print(f"Platform: {post_info['platform']}")
-        print(f"Author: {post_info['author']}")
-        print(f"Content: {post_info['content']}")
-        print(f"Image: {post_info['images']}")
-        response = askAi(post_info['images'],post_info['content'])
-        print(response.choices[0].message.content)
+    # Replace None values with default values for any missing or None fields
+        for key, default_value in default_values.items():
+            post_info[key] = post_info.get(key, default_value) or default_value
+    
+            # Create a folder to save images
+            folder_name = "down_image"
+            save_images(post_info['images'], folder_name)
+            print("\nExtracted Post Information:")
+            print(f"Platform: {post_info['platform']}")
+            print(f"Author: {post_info['author']}")
+            print(f"Content: {post_info['content']}")
+            print(f"Image: {post_info['images']}")
+            response = askAi(post_info['images'],post_info['content'])
+            print(response.choices[0].message.content)
 
         return render(request, "amaze/index.html", {
             'images': post_info['images'],
