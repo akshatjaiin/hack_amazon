@@ -13,7 +13,7 @@ import requests
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 import instaloader
-from * import constant 
+from . import constant 
 from openai import OpenAI
 load_dotenv()
 client = OpenAI(
@@ -145,23 +145,24 @@ def askAi(post_images,post_text):
     return response
 
 def index(request):
+    post_info = {};
     if request.method == "POST":
         print("Post Request receive")
         post_url = request.POST.get("post_url")  # Use request.POST to get the URL
         post_info = extract_post_info(post_url)
 
-        # Define default values for None objects
-    default_values = {
-      'content': "No Post Description Found",
-      'images': "No Images Found",
-      'platform': "Unknown",
-      'author': "Unknown"
-    }
+            # Define default values for None objects
+        default_values = {
+        'content': "No Post Description Found",
+        'images': "No Images Found",
+        'platform': "Unknown",
+        'author': "Unknown"
+        }
 
 # Replace None values with default values for any missing or None fields
-  for key, default_value in default_values.items():
-      post_info[key] = post_info.get(key, default_value) or default_value
- 
+        for key, default_value in default_values.items():
+            post_info[key] = post_info.get(key, default_value) or default_value
+
         # Create a folder to save images
         folder_name = "down_image"
         save_images(post_info['images'], folder_name)
