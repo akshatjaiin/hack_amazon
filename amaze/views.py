@@ -186,7 +186,7 @@ def index(request):
         ai_response= response.choices[0].message.content.replace("```","").replace("json","").replace("\n","");
         ai_response = loads(ai_response);
         print(ai_response);
-        amazon_search_result= amazon_product_search(f'{ai_response.get("query")}')[:5];
+        amazon_search_result= amazon_product_search(f'{ai_response.get("query")},' + ai_response.get("brand"));
         print(amazon_search_result);
 
         return render(request, "amaze/index.html", {
