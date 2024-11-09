@@ -1,6 +1,7 @@
 # importing libraries
 from bs4 import BeautifulSoup
 import requests
+import sys
 
 def main(URL):
     # opening our output file in append mode
@@ -9,8 +10,8 @@ def main(URL):
     # specifying user agent, You can use other user agents
     # available on the internet
     HEADERS = {
-    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.157 Safari/537.36',
-    'Accept-Language': 'en-US, en;q=0.5'
+        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.157 Safari/537.36',
+        'Accept-Language': 'en-US, en;q=0.5'
     }
 
     # Making the HTTP Request
@@ -91,9 +92,11 @@ def main(URL):
 
 
 if __name__ == '__main__':
-  # opening our url file to access URLs
-    file = open("url.txt", "r")
+    # opening our url file to access URLs
+    url:str = "";
+    if(len(sys.argv) < 2):raise Exception("Error give a amazon url for fetching data");
+    else:url = sys.argv[1]; 
 
     # iterating over the urls
-    for links in file.readlines():
-        main(links)
+    for links in url:
+        main(url)

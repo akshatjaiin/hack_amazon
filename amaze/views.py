@@ -15,6 +15,9 @@ from dotenv import load_dotenv
 import instaloader
 from . import constant 
 from openai import OpenAI
+from amazon_product_search import amazon_product_search ;
+from json import loads
+
 load_dotenv()
 client = OpenAI(
     # This is the default and can be omitted
@@ -179,7 +182,11 @@ def index(request):
         response = askAi(post_info['images'],post_info['content'])
         if(response == None):
             return HttpResponse("<p>Error, while asking gpt about product</p>");
-        print(response.choices[0].message.content)
+        print(response.choices[0].message.content.split("```"))
+        ai_response= response.choices[0].message.content.replace("```","").replace("json","").replace("\n","");
+        ai_response = loads(ai_response);
+        print(ai_response);
+        amazon_search_result= amazon_product_search(f'{ai_response.get("productType")},{ai_response.get("productCategory")},{ai_response.get("companyName")}')[:5];
 
         return render(request, "amaze/index.html", {
             'images': post_info['images'],
@@ -188,6 +195,7 @@ def index(request):
             'Platform': post_info['platform'],  # Remove curly braces and quotes
             'Author': post_info['author'],
             'Content': post_info['content'],
+            'amazon_search':f'{amazon_search_result}'
         })
 
     return render(request, "amaze/index.html")  # Handle GET request
