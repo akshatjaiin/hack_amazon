@@ -133,7 +133,13 @@
         <p><strong>Author: </strong>{{Author}}</p>
         <p><strong>Content: </strong> {{Content}} </p>
         <p><strong>>Ai Response: </strong>{{ai_res}} </p>
-        <p><strong>>Amazon Ouptut: </strong>{{amazon_search}} </p>
+        {% for product in products %}
+        <p><strong>>Amazon image: </strong><img src={{product.image}}></p>
+        <p><strong>>Amazon title: </strong>{{product.title}} </p>
+        <p><strong>>Amazon price: </strong>{{product.price}} </p>
+        <p><strong>>Amazon review: </strong>{{product.review}} </p>
+        <p><strong>>Amazon link: </strong><a href={{product.link}}>Link</a> </p>
+        {% endfor %}
 
         {% endif %}
       </div>

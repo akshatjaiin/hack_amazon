@@ -15,7 +15,7 @@ from dotenv import load_dotenv
 import instaloader
 from . import constant 
 from openai import OpenAI
-from amazon_product_search import amazon_product_search ;
+from .amazon_product_search import amazon_product_search ;
 from json import loads
 
 load_dotenv()
@@ -161,10 +161,10 @@ def index(request):
 
         # Define default values for None objects
         default_values = {
-        'content': "No Post Description Found",
-        'images': "No Images Found",
-        'platform': "Unknown",
-        'author': "Unknown"
+            'content': "No Post Description Found",
+            'images': "No Images Found",
+            'platform': "Unknown",
+            'author': "Unknown"
         }
 
         # Replace None values with default values for any missing or None fields
@@ -186,7 +186,8 @@ def index(request):
         ai_response= response.choices[0].message.content.replace("```","").replace("json","").replace("\n","");
         ai_response = loads(ai_response);
         print(ai_response);
-        amazon_search_result= amazon_product_search(f'{ai_response.get("productType")},{ai_response.get("productCategory")},{ai_response.get("companyName")}')[:5];
+        amazon_search_result= amazon_product_search(f'{ai_response.get("query")}')[:5];
+        print(amazon_search_result);
 
         return render(request, "amaze/index.html", {
             'images': post_info['images'],
@@ -195,7 +196,7 @@ def index(request):
             'Platform': post_info['platform'],  # Remove curly braces and quotes
             'Author': post_info['author'],
             'Content': post_info['content'],
-            'amazon_search':f'{amazon_search_result}'
+            'products':amazon_search_result
         })
 
     return render(request, "amaze/index.html")  # Handle GET request
