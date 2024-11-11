@@ -74,13 +74,18 @@ def process_media(folder_path, seconds_per_frame=2):
             print(f"Extracted {len(base64Frames)} frames")
             print(f"Extracted audio to {audio_path}")
 
-    audio_path = audio_path if audio_path else None
-    media = {
-        'frames': base64Frames,
-        'audio_path': audio_path
-    }
-    return media
-
+    try:
+        media = {
+            'frames': base64Frames,
+            'audio_path': audio_path
+        }
+        return media
+    except NameError or UnboundLocalError:
+        media = {
+            'frames': base64Frames,
+            'audio_path': None
+        }
+        return media
 
 def extract_instagram_post_info(url):
     """Extracts information from an Instagram post and downloads images using instaloader."""
