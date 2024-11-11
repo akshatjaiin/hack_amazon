@@ -124,22 +124,33 @@
         <!-- we have to recreate this -->
 
         {% if Content %}
-        <h3>{{heading}}</h3>
-        <p><strong>Platform:</strong> {{Platform}}</p>
-        <p><strong>Image</strong></p>
-        {% for image in  images%}
-        <img src={{image}} alt="image">
-        {% endfor %}
-        <p><strong>Author: </strong>{{Author}}</p>
-        <p><strong>Content: </strong> {{Content}} </p>
-        <p><strong>>Ai Response: </strong>{{ai_res}} </p>
-        {% for product in products %}
-        <p><strong>>Amazon image: </strong><img src={{product.image}}></p>
-        <p><strong>>Amazon title: </strong>{{product.title}} </p>
-        <p><strong>>Amazon price: </strong>{{product.price}} </p>
-        <p><strong>>Amazon review: </strong>{{product.review}} </p>
-        <p><strong>>Amazon link: </strong><a href={{product.link}}>Link</a> </p>
-        {% endfor %}
+          <h3>{{heading}}</h3>
+          <p><strong>Platform:</strong> {{Platform}}</p>
+          <p><strong>Image</strong></p>
+          {% if images %}
+            {% for image in  images %}
+              <img src={{image}} alt="image">
+            {% endfor %}
+          {% endif %}
+          {% if video %}
+            <p><strong>Video:</strong></p>
+            <video src={{video}} controls="controls"></video>
+          {% endif %}
+
+          {% for image in  images %}
+            <img src={{image}} alt="image">
+          {% endfor %}
+
+          <p><strong>Author: </strong>{{Author}}</p>
+          <p><strong>Content: </strong> {{Content}} </p>
+          <p><strong>>Ai Response: </strong>{{ai_res}} </p>
+          {% for product in products %}
+          <p><strong>>Amazon image: </strong><img src={{product.image}}></p>
+          <p><strong>>Amazon title: </strong>{{product.title}} </p>
+          <p><strong>>Amazon price: </strong>{{product.price}} </p>
+          <p><strong>>Amazon review: </strong>{{product.review}} </p>
+          <p><strong>>Amazon link: </strong><a href={{product.link}}>Link</a> </p>
+          {% endfor %}
 
         {% endif %}
       </div>
