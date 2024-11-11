@@ -108,7 +108,7 @@
   </head>
   <body>
     <header>
-      Retro Amazon Listing Generator
+      Social Amazon Listing Generator
     </header>
     <div class="main-container">
       <h2 class="text-center">Transform Your Posts into Winning Listings!</h2>
@@ -120,13 +120,15 @@
         <button type="submit">Generate Listing!</button>
       </form>
       <div class="result-card" id="resultCard">
-
+  
         <!-- we have to recreate this -->
-
+        {% if message %}
+        <div id="message">{{message}}</div>
+        {% endif %}
         {% if Content %}
-          <h3>{{heading}}</h3>
-          <p><strong>Platform:</strong> {{Platform}}</p>
-          <p><strong>Image</strong></p>
+        <h3>{{heading}}</h3>
+        <p><strong>Platform:</strong> {{Platform}}</p>
+        <p><strong>Image</strong></p>
           {% if images %}
             {% for image in  images %}
               <img src={{image}} alt="image">
@@ -136,29 +138,32 @@
             <p><strong>Video:</strong></p>
             <video src={{video}} controls="controls"></video>
           {% endif %}
-
-          {% for image in  images %}
-            <img src={{image}} alt="image">
-          {% endfor %}
-
-          <p><strong>Author: </strong>{{Author}}</p>
-          <p><strong>Content: </strong> {{Content}} </p>
-          <p><strong>>Ai Response: </strong>{{ai_res}} </p>
-          {% for product in products %}
-          <p><strong>>Amazon image: </strong><img src={{product.image}}></p>
-          <p><strong>>Amazon title: </strong>{{product.title}} </p>
-          <p><strong>>Amazon price: </strong>{{product.price}} </p>
-          <p><strong>>Amazon review: </strong>{{product.review}} </p>
-          <p><strong>>Amazon link: </strong><a href={{product.link}}>Link</a> </p>
-          {% endfor %}
-
+        <p><strong>Author: </strong>{{Author}}</p>
+        <p><strong>Content: </strong> {{Content}} </p>
+        <p><strong>>Ai Response: </strong>{{ai_res}} </p>
+        <h2 class="mt-5">Products</h2>
+        <div class="row">
+            {% for product in products %}
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <img src="{{ product.image }}" class="card-img-top" alt="Amazon image">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ product.title }}</h5>
+                            <p class="card-text"><strong>Price: </strong>{{ product.price }}</p>
+                            <p class="card-text"><strong>Review: </strong>{{ product.review }}</p>
+                            <a href="{{ product.link }}" class="btn btn-primary">View on Amazon</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
         {% endif %}
       </div>
     </div> 
 
-    {% for item in items %}
-
-    {% endfor %}
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
     <footer>
       <p>&copy; 2024 Retro Generator. <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>

@@ -13,21 +13,25 @@ import os
 
 def extract_media_base64(image_urls:list[str],video_url:str|None):
     media_base64 = {}
-    if video_url:
-        media_base64 = get_video_base64(video_url,fps=1)
-        media_base64["audio"] = audio_transcription(media_base64["audio"])
-    media_base64["images"] = [get_image_base64(image) for image in image_urls if image!=None];
-    print("media extraction done")
-    return media_base64;
+    try:
+        if video_url:
+            media_base64 = get_video_base64(video_url,fps=1)
+            media_base64["audio"] = audio_transcription(media_base64["audio"])
+        media_base64["images"] = [get_image_base64(image) for image in image_urls if image!=None];
+        print("media extraction done")
+    except Exception as e:
+        print(f"Error extracting Facebook post: {e}")
+    finally:
+        return media_base64;
 
 def get_image_base64(url:str):
-    res = requests.get(url);
-    if res.status_code == 200:
+    try:
+        res = requests.get(url);
+        if res.status_code != 200:
+            print("failed to fetch images");
+            return None;
         img_base64 = base64.b64encode(res.content).decode("utf-8")
         return img_base64
-    else:
-        print("failed to fetch images");
-        return None;
 def download_video(url,video_folder):
     video_path:str = os.path.join(video_folder,"video.mp4")
     with requests.get(url, stream=True) as r:
