@@ -42,6 +42,7 @@ def ask_ai(images:list=[],video:list|None=None,content:str="",transcription=None
         return None
 
 def audio_transcription(audio_base64:list):
+    print("transcripting the audio")
     audio_data = base64.b64decode(audio_base64)
     # Convert the byte data into a file-like object using BytesIO
     audio_file = BytesIO(audio_data)
@@ -52,4 +53,7 @@ def audio_transcription(audio_base64:list):
         file=audio_file,
     )
     print(transcriptions)
+    audio_file.truncate(0)
+    audio_file.seek(0)
+    del audio_file
     return transcriptions;

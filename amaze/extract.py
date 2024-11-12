@@ -1,4 +1,5 @@
 from PIL import Image
+import numpy as np
 from dotenv import load_dotenv
 import requests
 import instaloader
@@ -27,11 +28,12 @@ def extract_media_base64(image_urls:list[str],video_url:str|None):
 def get_image_base64(url:str):
     try:
         res = requests.get(url);
-        if res.status_code != 200:
-            print("failed to fetch images");
-            return None;
+        if res.status_code != 200:raise Exception("Failed to fetvh the image");
         img_base64 = base64.b64encode(res.content).decode("utf-8")
         return img_base64
+    except Exception as e:
+        print("Error: ",e);
+        return None;
 def download_video(url,video_folder):
     video_path:str = os.path.join(video_folder,"video.mp4")
     with requests.get(url, stream=True) as r:
@@ -56,18 +58,18 @@ def get_video_base64(url:str,fps:int=10,output_folder="public"):
 
     print("Extracting video frames")
     video_frames_base64 = [];
+    buffered = BytesIO();
     for frame_index,frame in enumerate(video.iter_frames(fps=min(video.fps,fps), dtype="uint8")):
         print("extracting the frame",frame_index);
         frame_img = Image.fromarray(frame);
-        buffered = BytesIO();
         frame_img.save(buffered,format="PNG");
-        video_frames_base64.append(base64.b64encode(buffered.getvalue()).decode('utf-8'));
-        buffered.close();
-        del buffered
+        video_frames_base64.append(base64.b64encode(buffered.getvalue()).decode('utf-8'))
+        buffered.truncate(0)
+        buffered.seek(0)
+    del buffered
     video.reader.close()
     video.audio.close()
     del video
-    
     os.remove(audio_path);
     print("Video extraction done")
     return {"video":video_frames_base64,"audio":audio_base64};

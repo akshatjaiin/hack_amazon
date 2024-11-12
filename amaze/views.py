@@ -47,10 +47,12 @@ def index(request):
                 'platform': "Unknown",
                 'author': "Unknown"
             }
+            print("asking the ai ...")
             response=ais.ask_ai(media["images"],media.get("video",None),post_info["content"],media.get("audio",None));
             if response==None:raise Exception("Error in ai response")
             queries = json.loads(response.choices[0].message.content.replace("```","").replace("json","").replace("\n",""))
             print("queries:",queries)
+            print("Searchingbon amazon ...")
             amazon_search_results:list = [];
             if type(queries)==list:
                 for query in queries:
@@ -62,14 +64,14 @@ def index(request):
             return render(request, "amaze/index.html", {
                 'images': post_info.get('images',None),
                 'video':post_info.get('video'),
-                'ai_res': response.choices[0].message.content,
+                # 'ai_res': response.choices[0].message.content,
                 'heading': "Extracted Post Information:",  # Use quotes around keys
                 'Platform': post_info['platform'],  # Remove curly braces and quotes
                 'Author': post_info['author'],
                 'Content': post_info['content'],
-                'products':amazon_search_results
+                # 'products':amazon_search_results
             })
-        except except Exception as e:
+        except Exception as e:
             return render(request, "amaze/index.html", {'message': e})
     return render(request, "amaze/index.html")  # Handle GET request
 
