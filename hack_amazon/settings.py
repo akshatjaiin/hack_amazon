@@ -29,6 +29,7 @@ DEBUG = True
 ALLOWED_HOSTS = [
     '192.0.0.4',
     '127.0.0.1',
+    'shop-the-post.onrender.com'
 ]
 
 
