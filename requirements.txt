@@ -4,3 +4,7 @@ openai==1.54.0
 instaloader==4.13.2
 beautifulsoup4==4.12.3 
 requests==2.32.3
+pillow
+ffmpeg
+moviepy
+numpy
