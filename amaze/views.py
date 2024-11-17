@@ -9,6 +9,7 @@ import json
 import base64
 from PIL import Image
 from io import BytesIO
+import instaloader
 
 def is_valid_base64_image(data_url):
     try:
@@ -64,13 +65,16 @@ def index(request):
             return render(request, "amaze/index.html", {
                 'images': post_info.get('images',None),
                 'video':post_info.get('video'),
-                # 'ai_res': response.choices[0].message.content,
+                'ai_res': response.choices[0].message.content,
                 'heading': "Extracted Post Information:",  # Use quotes around keys
                 'Platform': post_info['platform'],  # Remove curly braces and quotes
                 'Author': post_info['author'],
                 'Content': post_info['content'],
-                # 'products':amazon_search_results
+                'products':amazon_search_results
             })
+
+        except instaloader.exceptions.InstaloaderException as error:
+            return render(request, "amaze/index.html", {'message':"Post does not exist or cannot be downloaded."})
         except Exception as e:
             return render(request, "amaze/index.html", {'message': e})
     return render(request, "amaze/index.html")  # Handle GET request

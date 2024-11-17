@@ -84,21 +84,18 @@ def extract_instagram_post_info(url):
         save_metadata=True
     )
     shortcode = url.split('/')[-2]
-    try:
-        post = instaloader.Post.from_shortcode(loader.context, shortcode);
-        # Extracting post details
-        post_info = {
-            'platform': 'Instagram',
-            'author': post.owner_username,
-            'content': post.caption,  # Caption of the post
-            'images': [node.display_url for node in post.get_sidecar_nodes()],  # Handle video posts
-            'video':post.video_url
-        };
-        return post_info
-    except Exception as e:
-        print(f"Error extracting Instagram post: {e}")
-        return None
+    print(shortcode)
+    post = instaloader.Post.from_shortcode(loader.context, shortcode);
 
+    # Extracting post details
+    post_info = {
+        'platform': 'Instagram',
+        'author': post.owner_username,
+        'content': post.caption,  # Caption of the post
+        'images': [node.display_url for node in post.get_sidecar_nodes()],  # Handle video posts
+        'video':post.video_url
+    };
+    return post_info
 def extract_twitter_post_info(url):
     """Extracts information from a Twitter post and downloads images."""
     response = requests.get(url)
