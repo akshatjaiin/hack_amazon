@@ -1,0 +1,43 @@
+name: Deploy to Firebase Hosting
+
+on:
+  # push:
+  #   branches:
+  #     - main  # Trigger deployment on push to 'main' branch
+  workflow_dispatch:  # Manually trigger the workflow via GitHub UI
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Create .env file from secrets
+      run: |
+        echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env
+
+    - name: Build Docker image
+      run: |
+        docker build --file Dockerfile -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/my-image:${{ github.sha }} --build-arg ENV_FILE=.env .
+        docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/my-image:${{ github.sha }}
+
+    - name: Set up Firebase CLI
+      run: curl -sL https://firebase.tools | bash
+
+    - name: Authenticate to Firebase using token
+      run: firebase login:ci --token ${{ secrets.FIREBASE_TOKEN }}
+      env:
+        FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+
+    - name: Deploy to Firebase Hosting
+      run: |
+        firebase use --add
+        firebase deploy --only hosting
+      env:
+        FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+
