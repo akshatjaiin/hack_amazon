@@ -1,5 +1,7 @@
 # 🔎 Shop the Post
 
+[![Deploy to Firebase Hosting](https://github.com/akshatjaiin/hack_amazon/actions/workflows/firebase_deploy.yml/badge.svg)](https://github.com/akshatjaiin/hack_amazon/actions/workflows/firebase_deploy.yml)
+
 ### 🚀 Welcome to Amazon Product Search Web App
 This web application helps users discover similar products on Amazon based on social media posts. Paste a social media link, and the app will return the top 5 related products on Amazon, perfect for finding alternatives, gifts, or comparing brands!
 
